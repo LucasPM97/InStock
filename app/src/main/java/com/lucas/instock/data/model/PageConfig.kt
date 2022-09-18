@@ -1,6 +1,12 @@
 package com.lucas.instock.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+
+@Entity(tableName = "pageConfig")
 data class PageConfig(
+    @PrimaryKey(autoGenerate = true) val id: Int,
     val pageName: String,
     val pageDomain: String,
     val priceString: String,

@@ -1,9 +1,10 @@
 package com.lucas.instock.data.local
 
-import androidx.room.Dao
+import com.lucas.instock.data.local.database.product.ProductPageDao
 import com.lucas.instock.data.model.ProductPageInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 
@@ -11,6 +12,7 @@ interface IProductLocalDataSource {
     suspend fun storeProductChanges(productPageInfo: ProductPageInfo)
     suspend fun getAllUnsyncedProducts(): List<ProductPageInfo>
     suspend fun getAllProducts(): List<ProductPageInfo>
+    suspend fun getAllProductsFlow(): Flow<List<ProductPageInfo>>
 }
 
 class ProductLocalDataSource(
@@ -34,5 +36,8 @@ class ProductLocalDataSource(
             return@withContext productDao.getAllProducts()
         }
     }
+
+    override suspend fun getAllProductsFlow(): Flow<List<ProductPageInfo>> =
+        productDao.getAllProductsFlow()
 
 }

@@ -5,10 +5,13 @@ import com.lucas.instock.data.model.ProductPageInfo
 import com.lucas.instock.data.remote.IProductRemoteDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 interface IProductRepository {
+    suspend fun getProductsFlow(): Flow<List<ProductPageInfo>>
+    suspend fun updateProduct(productPageInfo: ProductPageInfo)
     suspend fun getAllProducts(): List<ProductPageInfo>
     suspend fun getUnsyncedProducts(): List<ProductPageInfo>
     suspend fun getProductPageContent(url: String): String?
@@ -21,6 +24,13 @@ class ProductRepository(
     private val localDataSource: IProductLocalDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : IProductRepository {
+
+    override suspend fun getProductsFlow() = localDataSource.getAllProductsFlow()
+
+    override suspend fun updateProduct(productPageInfo: ProductPageInfo) {
+        localDataSource.storeProductChanges(productPageInfo)
+    }
+
     override suspend fun getAllProducts(): List<ProductPageInfo> {
         return withContext(dispatcher) {
             return@withContext localDataSource.getAllUnsyncedProducts()

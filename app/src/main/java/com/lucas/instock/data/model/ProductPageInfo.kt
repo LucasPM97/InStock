@@ -3,11 +3,12 @@ package com.lucas.instock.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "product_table")
+@Entity(tableName = "product")
 data class ProductPageInfo(
     @PrimaryKey(autoGenerate = true) val productId: Int,
     val pageName: String,
     val synced: Boolean,
+    val syncState: ProductSyncState,
     val url: String,
     val notifyPriceChanged: Boolean,
     val inPreOrder: Boolean,
@@ -17,3 +18,9 @@ data class ProductPageInfo(
     val preOwnedInStock: Boolean,
     val notifyPreOwnedStockChanges: Boolean,
 )
+
+enum class ProductSyncState {
+    Synced,
+    IsLoading,
+    Error
+}
