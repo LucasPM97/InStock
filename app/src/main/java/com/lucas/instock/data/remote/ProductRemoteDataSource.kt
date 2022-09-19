@@ -1,17 +1,19 @@
 package com.lucas.instock.data.remote
 
+import com.lucas.instock.di.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 
 interface IProductRemoteDataSource {
     suspend fun getUrlContent(url: String): String
 }
 
-class ProductRemoteDataSource(
+class ProductRemoteDataSource@Inject constructor(
     private val customApi: CustomApi,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : IProductRemoteDataSource {
 
     override suspend fun getUrlContent(url: String): String {

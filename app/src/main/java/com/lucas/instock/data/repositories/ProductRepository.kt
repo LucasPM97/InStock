@@ -3,11 +3,13 @@ package com.lucas.instock.data.repositories
 import com.lucas.instock.data.local.IProductLocalDataSource
 import com.lucas.instock.data.model.ProductPageInfo
 import com.lucas.instock.data.remote.IProductRemoteDataSource
+import com.lucas.instock.di.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import javax.inject.Inject
 
 interface IProductRepository {
     suspend fun getProductsFlow(): Flow<List<ProductPageInfo>>
@@ -19,10 +21,10 @@ interface IProductRepository {
     suspend fun deleteAllProducts()
 }
 
-class ProductRepository(
+class ProductRepository @Inject constructor(
     private val remoteDataSource: IProductRemoteDataSource,
     private val localDataSource: IProductLocalDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : IProductRepository {
 
     override suspend fun getProductsFlow() = localDataSource.getAllProductsFlow()

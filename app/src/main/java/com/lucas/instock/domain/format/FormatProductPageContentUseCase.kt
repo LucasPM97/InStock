@@ -3,11 +3,13 @@ package com.lucas.instock.domain.format
 import com.lucas.instock.data.local.PageConfigLocalDataSource
 import com.lucas.instock.data.model.PageConfig
 import com.lucas.instock.data.model.ProductPageInfo
+import com.lucas.instock.di.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-interface IFormatPorductPageContentUseCase {
+interface IFormatProductPageContentUseCase {
 
     suspend fun getPageConfigByProductId(productId: Int): PageConfig
 
@@ -17,10 +19,10 @@ interface IFormatPorductPageContentUseCase {
     ): ProductPageInfo
 }
 
-class FormatPorductPageContentUseCase(
+class FormatProductPageContentUseCase@Inject constructor(
     private val pageConfigLocalDataSource: PageConfigLocalDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) : IFormatPorductPageContentUseCase {
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : IFormatProductPageContentUseCase {
 
     suspend operator fun invoke(productId: Int, pageContent: String): ProductPageInfo {
         return withContext(dispatcher) {

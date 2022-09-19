@@ -2,11 +2,13 @@ package com.lucas.instock.data.repositories
 
 import com.lucas.instock.data.local.IPriceLocalDataSource
 import com.lucas.instock.data.model.ProductPrice
+import com.lucas.instock.di.DefaultDispatcher
 import com.lucas.instock.ui.models.Product
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface IProductPriceRepository {
     suspend fun getLatestPricePerProductFlow(): Flow<List<ProductPrice>>
@@ -17,9 +19,9 @@ interface IProductPriceRepository {
     suspend fun deleteAll()
 }
 
-class ProductPriceRepository(
+class ProductPriceRepository@Inject constructor(
     private val localDataSource: IPriceLocalDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : IProductPriceRepository {
     override suspend fun getLatestPricePerProductFlow(): Flow<List<ProductPrice>> =
         localDataSource.getLatestPricePerProductFlow()

@@ -2,10 +2,12 @@ package com.lucas.instock.data.local
 
 import com.lucas.instock.data.local.database.price.ProductPriceDao
 import com.lucas.instock.data.model.ProductPrice
+import com.lucas.instock.di.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface IPriceLocalDataSource {
     suspend fun storeLatestPrice(price: ProductPrice)
@@ -14,9 +16,9 @@ interface IPriceLocalDataSource {
     suspend fun getPriceHistoryByProductId(productId: Int): List<ProductPrice>
 }
 
-class PriceLocalDataSource(
+class PriceLocalDataSource@Inject constructor(
     private val priceDao: ProductPriceDao,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : IPriceLocalDataSource {
     override suspend fun storeLatestPrice(price: ProductPrice) {
         return withContext(dispatcher) {
