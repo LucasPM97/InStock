@@ -6,24 +6,28 @@ import com.lucas.instock.data.repositories.IProductPriceRepository
 import com.lucas.instock.data.repositories.IProductRepository
 import com.lucas.instock.di.DefaultDispatcher
 import com.lucas.instock.domain.format.FormatProductPageContentUseCase
+import com.lucas.instock.ui.models.Product
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface IFetchUnsyncedProductsUseCase {
+    suspend operator fun invoke()
     suspend fun fetchUnsyncProducts()
     suspend fun storeProductChanges(productInfo: ProductPageInfo)
     suspend fun fetchProduct(productInfo: ProductPageInfo)
 }
 
-class FetchUnsyncedProductsUseCase@Inject constructor(
+class FetchUnsyncedProductsUseCase @Inject constructor(
     private val productRepository: IProductRepository,
     private val priceRepository: IProductPriceRepository,
     private val formatProductPageContentUseCase: FormatProductPageContentUseCase,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : IFetchUnsyncedProductsUseCase {
-    suspend operator fun invoke() {
+    override suspend operator fun invoke() {
         return withContext(dispatcher) {
             return@withContext fetchUnsyncProducts()
         }
