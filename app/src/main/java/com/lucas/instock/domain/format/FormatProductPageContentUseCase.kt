@@ -11,6 +11,8 @@ import javax.inject.Inject
 
 interface IFormatProductPageContentUseCase {
 
+    suspend operator fun invoke(productId: Int, pageContent: String): ProductPageInfo
+
     suspend fun getPageConfigByProductId(productId: Int): PageConfig
 
     suspend fun formatPageContentByPageConfig(
@@ -19,12 +21,12 @@ interface IFormatProductPageContentUseCase {
     ): ProductPageInfo
 }
 
-class FormatProductPageContentUseCase@Inject constructor(
+class FormatProductPageContentUseCase @Inject constructor(
     private val pageConfigLocalDataSource: PageConfigLocalDataSource,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : IFormatProductPageContentUseCase {
 
-    suspend operator fun invoke(productId: Int, pageContent: String): ProductPageInfo {
+    override suspend operator fun invoke(productId: Int, pageContent: String): ProductPageInfo {
         return withContext(dispatcher) {
             val pageConfig = getPageConfigByProductId(productId)
             return@withContext formatPageContentByPageConfig(pageContent, pageConfig)
