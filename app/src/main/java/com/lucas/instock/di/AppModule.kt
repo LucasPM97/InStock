@@ -17,6 +17,7 @@ object AppModule {
     @Singleton
     fun provideCustomApi(): CustomApi {
         return Retrofit.Builder()
+            .baseUrl("https://www.google.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(CustomApi::class.java)
