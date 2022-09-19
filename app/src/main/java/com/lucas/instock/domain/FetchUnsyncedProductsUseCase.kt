@@ -4,23 +4,25 @@ import com.lucas.instock.data.model.ProductPageInfo
 import com.lucas.instock.data.model.ProductSyncState
 import com.lucas.instock.data.repositories.IProductPriceRepository
 import com.lucas.instock.data.repositories.IProductRepository
-import com.lucas.instock.domain.format.FormatPorductPageContentUseCase
+import com.lucas.instock.di.DefaultDispatcher
+import com.lucas.instock.domain.format.FormatProductPageContentUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-interface IFetchProductUseCase {
+interface IFetchUnsyncedProductsUseCase {
     suspend fun fetchUnsyncProducts()
     suspend fun storeProductChanges(productInfo: ProductPageInfo)
     suspend fun fetchProduct(productInfo: ProductPageInfo)
 }
 
-class FetchUnsyncedProductsUseCase(
+class FetchUnsyncedProductsUseCase@Inject constructor(
     private val productRepository: IProductRepository,
     private val priceRepository: IProductPriceRepository,
-    private val formatPorductPageContentUseCase: FormatPorductPageContentUseCase,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-) : IFetchProductUseCase {
+    private val formatProductPageContentUseCase: FormatProductPageContentUseCase,
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+) : IFetchUnsyncedProductsUseCase {
     suspend operator fun invoke() {
         return withContext(dispatcher) {
             return@withContext fetchUnsyncProducts()
@@ -58,7 +60,7 @@ class FetchUnsyncedProductsUseCase(
             ?: throw Exception("There was an error trying to connect with page")
 
         val updatedProductPageInfo =
-            formatPorductPageContentUseCase(productInfo.productId, pageContet)
+            formatProductPageContentUseCase(productInfo.productId, pageContet)
 
         TODO("Notify changes if is needed")
         TODO("Update price if is needed")

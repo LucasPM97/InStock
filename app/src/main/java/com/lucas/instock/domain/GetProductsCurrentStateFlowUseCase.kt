@@ -7,12 +7,13 @@ import com.lucas.instock.data.repositories.IProductRepository
 import com.lucas.instock.ui.models.Product
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 interface IGetProductsCurrentStateFlowUseCase {
     suspend operator fun invoke(scope: CoroutineScope): StateFlow<List<Product>>
 }
 
-class GetProductsCurrentStateFlowUseCase(
+class GetProductsCurrentStateFlowUseCase @Inject constructor(
     private val productRepository: IProductRepository,
     private val priceRepository: IProductPriceRepository,
 ) : IGetProductsCurrentStateFlowUseCase {
@@ -26,13 +27,12 @@ class GetProductsCurrentStateFlowUseCase(
         val prices = priceRepository.getLatestPricePerProductFlow()
 
         products.combine(prices) { products, prices ->
-            products?.let {
-                if (products.isNotEmpty()) {
-                    _productList.update {
-                        products.toProductList(prices)
-                    }
+            if (products.isNotEmpty()) {
+                _productList.update {
+                    products.toProductList(prices)
                 }
             }
+
         }.launchIn(scope)
 
         return productList
