@@ -7,20 +7,27 @@ import androidx.room.PrimaryKey
 data class ProductPageInfo(
     @PrimaryKey(autoGenerate = true) val productId: Int,
     val pageName: String,
-    val synced: Boolean,
-    val syncState: ProductSyncState,
+    val urlType: ProductUrlType = ProductUrlType.WebPage,
+    val synced: Boolean = false,
+    val syncState: ProductSyncState = ProductSyncState.UnSynced,
     val url: String,
-    val notifyPriceChanged: Boolean,
-    val inPreOrder: Boolean,
-    val notifyPreOrder: Boolean,
-    val inStock: Boolean,
-    val notifyStockChanges: Boolean,
-    val preOwnedInStock: Boolean,
-    val notifyPreOwnedStockChanges: Boolean,
+    val notifyPriceChanged: Boolean = false,
+    val inPreOrder: Boolean = false,
+    val notifyPreOrder: Boolean = false,
+    val inStock: Boolean = false,
+    val notifyStockChanges: Boolean = false,
+    val preOwnedInStock: Boolean = false,
+    val notifyPreOwnedStockChanges: Boolean = false,
 )
 
 enum class ProductSyncState {
     Synced,
+    UnSynced,
     IsLoading,
     Error
+}
+
+enum class ProductUrlType {
+    API,
+    WebPage
 }

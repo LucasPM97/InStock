@@ -2,12 +2,16 @@ package com.lucas.instock.data.repositories
 
 import com.lucas.instock.data.local.IProductLocalDataSource
 import com.lucas.instock.data.model.ProductPageInfo
+import com.lucas.instock.data.model.ProductUrlType
 import com.lucas.instock.data.remote.IProductRemoteDataSource
 import com.lucas.instock.di.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Response
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -16,7 +20,7 @@ interface IProductRepository {
     suspend fun updateProduct(productPageInfo: ProductPageInfo)
     suspend fun getAllProducts(): List<ProductPageInfo>
     suspend fun getUnsyncedProducts(): List<ProductPageInfo>
-    suspend fun getProductPageContent(url: String): String?
+    suspend fun getProductPageContent(url: String, urlType: ProductUrlType): String?
     suspend fun deleteProduct(productId: Int)
     suspend fun deleteAllProducts()
 }
@@ -45,10 +49,13 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    override suspend fun getProductPageContent(url: String): String? {
+    override suspend fun getProductPageContent(url: String, urlType: ProductUrlType): String? {
         return withContext(dispatcher) {
             val response = try {
-                remoteDataSource.getUrlContent(url)
+                if (urlType == ProductUrlType.WebPage)
+                    remoteDataSource.getUrlWebPageContent(url)
+                else
+                    remoteDataSource.getUrlApiContent(url)
             } catch (e: Exception) {
                 print(e)
                 null
