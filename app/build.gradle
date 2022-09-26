@@ -42,6 +42,8 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/atomicfu.kotlin_module'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'mozilla/public-suffix-list.txt'
     }
     kapt {
         correctErrorTypes = true
@@ -77,6 +79,9 @@ dependencies {
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
+
+    // Skrape for Scraping
+    implementation "it.skrape:skrapeit:1.3.0-alpha.1"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:2.38.1"
