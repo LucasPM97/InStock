@@ -5,6 +5,8 @@ import it.skrape.core.htmlDocument
 import it.skrape.fetcher.BrowserFetcher
 import it.skrape.fetcher.response
 import it.skrape.fetcher.skrape
+import it.skrape.matchers.toBe
+import it.skrape.selects.html5.h1
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,7 +31,7 @@ class ProductRemoteDataSource @Inject constructor(
 
     override suspend fun getUrlWebPageContent(requestUrl: String): String? {
         return withContext(dispatcher) {
-            return@withContext skrape(BrowserFetcher) {
+            return@withContext skrape(CustomBrowserFetcher) {
                 request {
                     url = requestUrl
                 }

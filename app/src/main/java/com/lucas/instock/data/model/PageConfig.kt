@@ -9,10 +9,13 @@ data class PageConfig(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val pageName: String,
     val pageDomain: String,
-    val priceString: String,
-    val stockString: String?,
-    val preOrderString: String?,
-    val preOwnedUrl: String?,
-    val wishListUrl: String?,
-    val wishListItemString: String?
+    val rootElementPath: String,
+    val productNameElementPath: String,
+    val imageElementPath: String,
+    val priceElementPath: String,
+    val stockElementPath: String,
+    val preOrderElementPath: String? = null,
+    val preOwnedUrl: String? = null,
+    val wishListUrl: String? = null,
+    val wishListItemString: String? = null
 )

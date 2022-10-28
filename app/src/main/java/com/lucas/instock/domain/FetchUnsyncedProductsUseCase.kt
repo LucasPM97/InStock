@@ -41,12 +41,12 @@ class FetchUnsyncedProductsUseCase @Inject constructor(
                 ProductPageInfo(
                     productId = 0,
                     pageName = "Page Name",
-                    urlType = ProductUrlType.API,
+                    urlType = ProductUrlType.WebPage,
                     synced = false,
                     syncState = ProductSyncState.Synced,
-                    url = "https://api.amiami.com/api/v1.0/item?gcode=FIGURE-011624&lang=eng"
-//                  url = "https://www.amiami.com/eng/detail/?gcode=FIGURE-139629"
-//                  url = "https://entelequia.com.ar/producto/persona-3-05_26846"
+//                    url = "https://api.amiami.com/api/v1.0/item?gcode=FIGURE-011624&lang=eng"
+//                    url = "https://www.amiami.com/eng/detail/?gcode=FIGURE-139629"
+                    url = "https://entelequia.com.ar/producto/persona-3-05_26846"
 //                  url = "https://reactjs.org/"
                 )
             )//productRepository.getUnsyncedProducts()
