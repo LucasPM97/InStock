@@ -1,8 +1,6 @@
 package com.lucas.instock.domain.format
 
-import android.os.Build
-import android.text.Html
-import com.lucas.instock.data.local.PageConfigLocalDataSource
+import com.lucas.instock.data.local.IPageConfigLocalDataSource
 import com.lucas.instock.data.model.PageConfig
 import com.lucas.instock.data.model.ProductPageInfo
 import com.lucas.instock.data.model.ProductSyncState
@@ -23,7 +21,7 @@ interface IFormatProductPageContentUseCase {
 }
 
 class FormatProductPageContentUseCase @Inject constructor(
-    private val pageConfigLocalDataSource: PageConfigLocalDataSource,
+    private val pageConfigLocalDataSource: IPageConfigLocalDataSource,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : IFormatProductPageContentUseCase {
 
@@ -34,7 +32,7 @@ class FormatProductPageContentUseCase @Inject constructor(
         }
     }
 
-    fun getPageConfigByProductId(productId: Int): PageConfig {
+    private fun getPageConfigByProductId(productId: Int): PageConfig {
         val pageConfig = PageConfig(
             id = 0,
             pageName = "Entelequia",
@@ -51,7 +49,7 @@ class FormatProductPageContentUseCase @Inject constructor(
         return pageConfig
     }
 
-    fun formatPageContentByPageConfig(
+    protected fun formatPageContentByPageConfig(
         pageContent: String, pageConfig: PageConfig
     ): ProductPageInfo {
 
@@ -80,6 +78,7 @@ class FormatProductPageContentUseCase @Inject constructor(
         val productStockElement =
             productRootElement.subStringFromElementPath(pageConfig.stockElementPath)
 
+        //TODO: Separate value from HTML elements
         return ProductPageInfo(
             productId = 0,
             pageName = "Page Name",
