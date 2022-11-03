@@ -86,7 +86,7 @@ fun HtmlString.findElement(path: List<PathElement>): HtmlString? {
     path.forEach { pathElement ->
 
         if (elementsFound.isEmpty()) {
-            searchAllElementsIndex(pathElement.element, pathElement.className)
+            findAllElements(pathElement.element, pathElement.className)
                 .forEach {
                     elementsFound.add(this.elementAt(it))
                 }
@@ -95,17 +95,16 @@ fun HtmlString.findElement(path: List<PathElement>): HtmlString? {
 
             elementsFound.forEach { elementHtml ->
                 elementHtml
-                    .searchAllElementsIndex(pathElement.element, pathElement.className)
+                    .findAllElements(pathElement.element, pathElement.className)
+                    .filter {
+                        elementHtml.isParentOf(it)
+                    }
                     .forEach {
-                        if (elementHtml.isParentOf(it)) {
-                            tempElementsFound.add(
-                                elementHtml.elementAt(it)
-                            )
-                        }
-
+                        tempElementsFound.add(
+                            elementHtml.elementAt(it)
+                        )
                     }
             }
-
 
             if (tempElementsFound.isEmpty()) return null
 
@@ -113,12 +112,10 @@ fun HtmlString.findElement(path: List<PathElement>): HtmlString? {
         }
     }
 
-    print(elementsFound)
-
     return elementsFound.firstOrNull()
 }
 
-fun HtmlString.searchAllElementsIndex(elementTag: String, className: String?): List<Int> {
+fun HtmlString.findAllElements(elementTag: String, className: String?): List<Int> {
     val searchBy: String = "<${elementTag}" +
             if (className != null) {
                 ".*class(?==\"$className\")"
@@ -142,6 +139,9 @@ fun HtmlString.elementAt(index: Int): HtmlString {
     }
 }
 
+// To makes this code more understandable we should add as parameter the Html element
+// but to simplify the code and avoid useless use of resources I prefer to just add the Index where the child start
+// E.g: '<' for '<div>'
 fun HtmlString.isParentOf(startPoint: Int): Boolean {
     var elementsFound = 0
 
@@ -166,5 +166,9 @@ fun HtmlString.isParentOf(startPoint: Int): Boolean {
     }
 
     return true
+}
+
+fun HtmlString.getContent(){
+
 }
 
