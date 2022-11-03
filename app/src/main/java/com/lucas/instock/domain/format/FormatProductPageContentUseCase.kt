@@ -6,13 +6,13 @@ import com.lucas.instock.data.model.ProductPageInfo
 import com.lucas.instock.data.model.ProductSyncState
 import com.lucas.instock.data.model.ProductUrlType
 import com.lucas.instock.di.DefaultDispatcher
-import com.lucas.instock.domain.models.format.HtmlString
-import com.lucas.instock.domain.models.format.PathElement
 import com.lucas.instock.domain.models.format.findElement
-import com.lucas.instock.domain.models.format.htmlString
+import com.lucas.instock.domain.models.format.jsoupElement
+import com.lucas.instock.domain.models.format.mapPath
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jsoup.nodes.Element
 import javax.inject.Inject
 
 interface IFormatProductPageContentUseCase {
@@ -32,21 +32,9 @@ class FormatProductPageContentUseCase @Inject constructor(
         }
     }
 
-    private fun getPageConfigByProductId(productId: Int): PageConfig {
-        val pageConfig = PageConfig(
-            id = 0,
-            pageName = "Entelequia",
-            pageDomain = "https://entelequia.com.ar/",
-            rootElementPath = "div.root/div.product inner-page max-container container-fluid/div.row",
-            productNameElementPath = "div.product-info mt-5 mt-sm-0 col-md-6 col-12/h4",
-            imageElementPath = "div.text-center active carousel-item/figure.iiz  /div/img.iiz__img  ",
-            priceElementPath = "div.product-info mt-5 mt-sm-0 col-md-6 col-12/p.product-price mb-4",
-            stockElementPath = "div.product-info mt-5 mt-sm-0 col-md-6 col-12/div.cart-control/button.add-to-cart button-loader"
-        )
-//            pageConfigLocalDataSource.getPageConfigByProductId(productId)
-//                ?: throw Exception("There's not a page configuration for this product")
-
-        return pageConfig
+    private suspend fun getPageConfigByProductId(productId: Int): PageConfig {
+        return pageConfigLocalDataSource.getPageConfigByProductId(productId)
+            ?: throw Exception("There's not a page configuration for this product")
     }
 
     protected fun formatPageContentByPageConfig(
@@ -59,24 +47,31 @@ class FormatProductPageContentUseCase @Inject constructor(
             throw Exception("Not valid content")
         }
 
-        val productRootElement = pageContent.htmlString {
-            subStringFromElementPath(pageConfig.rootElementPath)
+        val productRootElement = pageContent.jsoupElement {
+            findElement(
+                mapPath(pageConfig.rootElementPath)
+            )
         } ?: throw Exception("Root element not found")
 
-        val productNameElement =
-            productRootElement.subStringFromElementPath(pageConfig.productNameElementPath)
-                ?: throw Exception("Name element not found")
+        val productNameElement = findElementByPath(
+            productRootElement,
+            pageConfig.productNameElementPath
+        ) ?: throw Exception("Name element not found")
 
-        val productImageElement =
-            productRootElement.subStringFromElementPath(pageConfig.imageElementPath)
-                ?: throw Exception("Image element not found")
+        val productImageElement = findElementByPath(
+            productRootElement,
+            pageConfig.imageElementPath
+        ) ?: throw Exception("Image element not found")
 
-        val productPriceElement =
-            productRootElement.subStringFromElementPath(pageConfig.priceElementPath)
-                ?: throw Exception("Price element not found")
+        val productPriceElement = findElementByPath(
+            productRootElement,
+            pageConfig.priceElementPath
+        ) ?: throw Exception("Price element not found")
 
-        val productStockElement =
-            productRootElement.subStringFromElementPath(pageConfig.stockElementPath)
+        val productStockElement = findElementByPath(
+            productRootElement,
+            pageConfig.stockElementPath
+        )
 
         //TODO: Separate value from HTML elements
         return ProductPageInfo(
@@ -92,24 +87,9 @@ class FormatProductPageContentUseCase @Inject constructor(
 //        TODO("Get product current price")
     }
 
-    private fun HtmlString.subStringFromElementPath(elementPath: String): HtmlString? {
-
-        val pathElements: List<PathElement> = elementPath.split("/").map {
-            if (it.contains(".")) {
-                it.split(".").let { (first, second) ->
-                    PathElement(
-                        first, second
-                    )
-                }
-            } else {
-                PathElement(
-                    it,
-                )
-            }
-        }
-
-        return findElement(pathElements)
-    }
+    private fun findElementByPath(parent: Element, path: String): Element? = parent.findElement(
+        mapPath(path)
+    )
 
     private fun checkIsValidContent(pageContent: String): Boolean {
 

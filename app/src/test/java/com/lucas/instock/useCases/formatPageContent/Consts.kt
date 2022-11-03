@@ -8,11 +8,11 @@ object Consts {
             id = 0,
             pageName = "Entelequia",
             pageDomain = "https://entelequia.com.ar/",
-            rootElementPath = "div/div.container-fluid/div.row",
+            rootElementPath = "div#root/div.container-fluid/div.row",
             productNameElementPath = "div.product-info mt-5 mt-sm-0 col-md-6 col-12/h4",
-            imageElementPath = "div.text-center active carousel-item/figure.iiz  /div/img.iiz__img  ",
+            imageElementPath = "div.text-center active carousel-item/figure.iiz/div/img.iiz__img",
             priceElementPath = "div.product-info mt-5 mt-sm-0 col-md-6 col-12/p.product-price mb-4",
-            stockElementPath = "div.product-info mt-5 mt-sm-0 col-md-6 col-12/div.cart-control/button.add-to-cart button-loader"
+            stockElementPath = "div.cart-control/button.add-to-cart button-loader"
         )
     }
 
@@ -73,7 +73,7 @@ object Consts {
                 "              </button>\n" +
                 "            </div>"
 
-        const val BaseHTML = "<div>\n" +
+        const val BaseHTML = "<div id=\"root\">\n" +
                 "    <div class=\"container-fluid\">\n" +
                 "        <div class=\"topbar row\">\n" +
                 "        </div>\n" +
