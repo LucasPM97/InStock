@@ -1,6 +1,7 @@
 package com.lucas.instock.useCases.formatPageContent
 
 import com.lucas.instock.domain.format.FormatProductPageContentUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -21,9 +22,9 @@ class FormatProductPageContentUseCaseTest {
 
     @Test
     fun `Map valid HTML to ProductInfo model`() = runTest {
-        val useCase = FormatProductPageContentUseCase(dataSourceMock)
+        val useCase = FormatProductPageContentUseCase(Dispatchers.IO)
         launch {
-            val a = useCase(0, Consts.HtmlElements.BaseHTML)
+            val a = useCase(Consts.HtmlElements.BaseHTML, Consts.Models.PageConfig)
             assertTrue(true)
         }
     }

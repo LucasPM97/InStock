@@ -1,45 +1,38 @@
 package com.lucas.instock.domain.format
 
-import com.lucas.instock.data.local.IPageConfigLocalDataSource
 import com.lucas.instock.data.model.PageConfig
-import com.lucas.instock.data.model.ProductPageInfo
-import com.lucas.instock.data.model.ProductSyncState
-import com.lucas.instock.data.model.ProductUrlType
 import com.lucas.instock.di.DefaultDispatcher
 import com.lucas.instock.domain.models.format.findElement
 import com.lucas.instock.domain.models.format.jsoupElement
-import com.lucas.instock.domain.models.format.mapPath
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jsoup.nodes.Element
 import javax.inject.Inject
 
 interface IFormatProductPageContentUseCase {
 
-    suspend operator fun invoke(productId: Int, pageContent: String): ProductPageInfo
+    suspend operator fun invoke(
+        pageContent: String,
+        pageConfig: PageConfig
+    ): MappedProductPageContent
 }
 
 class FormatProductPageContentUseCase @Inject constructor(
-    private val pageConfigLocalDataSource: IPageConfigLocalDataSource,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) : IFormatProductPageContentUseCase {
 
-    override suspend operator fun invoke(productId: Int, pageContent: String): ProductPageInfo {
+    override suspend operator fun invoke(
+        pageContent: String,
+        pageConfig: PageConfig
+    ): MappedProductPageContent {
         return withContext(dispatcher) {
-            val pageConfig = getPageConfigByProductId(productId)
             return@withContext formatPageContentByPageConfig(pageContent, pageConfig)
         }
     }
 
-    private suspend fun getPageConfigByProductId(productId: Int): PageConfig {
-        return pageConfigLocalDataSource.getPageConfigByProductId(productId)
-            ?: throw Exception("There's not a page configuration for this product")
-    }
-
     protected fun formatPageContentByPageConfig(
         pageContent: String, pageConfig: PageConfig
-    ): ProductPageInfo {
+    ): MappedProductPageContent {
 
         val isValid = checkIsValidContent(pageContent)
 
@@ -49,47 +42,34 @@ class FormatProductPageContentUseCase @Inject constructor(
 
         val productRootElement = pageContent.jsoupElement {
             findElement(
-                mapPath(pageConfig.rootElementPath)
+                pageConfig.rootElementPath
             )
         } ?: throw Exception("Root element not found")
 
-        val productNameElement = findElementByPath(
-            productRootElement,
+        val productNameElement = productRootElement.findElement(
             pageConfig.productNameElementPath
         ) ?: throw Exception("Name element not found")
 
-        val productImageElement = findElementByPath(
-            productRootElement,
+        val productImageElement = productRootElement.findElement(
             pageConfig.imageElementPath
         ) ?: throw Exception("Image element not found")
 
-        val productPriceElement = findElementByPath(
-            productRootElement,
+        val productPriceElement = productRootElement.findElement(
             pageConfig.priceElementPath
         ) ?: throw Exception("Price element not found")
 
-        val productStockElement = findElementByPath(
-            productRootElement,
+        val productStockElement = productRootElement.findElement(
             pageConfig.stockElementPath
         )
 
-        //TODO: Separate value from HTML elements
-        return ProductPageInfo(
-            productId = 0,
-            pageName = "Page Name",
-            urlType = ProductUrlType.WebPage,
-            synced = false,
-            syncState = ProductSyncState.Synced,
-            url = "https://entelequia.com.ar/producto/persona-3-05_26846"
-        )
-//        TODO("Use the PageConfig to know the rules to get the needed information")
-//        TODO("Get product current status")
-//        TODO("Get product current price")
-    }
 
-    private fun findElementByPath(parent: Element, path: String): Element? = parent.findElement(
-        mapPath(path)
-    )
+        return MappedProductPageContent(
+            name = productNameElement.text(),
+            imageUrl = productImageElement.absUrl("src"),
+            price = productPriceElement.text(),
+            hasStock = productStockElement != null && productStockElement.text().isNotEmpty()
+        )
+    }
 
     private fun checkIsValidContent(pageContent: String): Boolean {
 
@@ -99,5 +79,11 @@ class FormatProductPageContentUseCase @Inject constructor(
 
         return true
     }
-
 }
+
+data class MappedProductPageContent(
+    val name: String,
+    val price: String,
+    val imageUrl: String,
+    val hasStock: Boolean = false
+)

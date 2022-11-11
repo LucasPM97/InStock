@@ -3,8 +3,10 @@ package com.lucas.instock.domain
 import com.lucas.instock.data.model.ProductPageInfo
 import com.lucas.instock.data.model.ProductSyncState
 import com.lucas.instock.data.model.ProductUrlType
+import com.lucas.instock.data.repositories.IPageConfigRepository
 import com.lucas.instock.data.repositories.IProductPriceRepository
 import com.lucas.instock.data.repositories.IProductRepository
+import com.lucas.instock.data.repositories.PageConfigRepository
 import com.lucas.instock.di.DefaultDispatcher
 import com.lucas.instock.domain.format.FormatProductPageContentUseCase
 import com.lucas.instock.domain.format.IFormatProductPageContentUseCase
@@ -26,6 +28,7 @@ interface IFetchUnsyncedProductsUseCase {
 class FetchUnsyncedProductsUseCase @Inject constructor(
     private val productRepository: IProductRepository,
     private val priceRepository: IProductPriceRepository,
+    private val pageConfigRepository: IPageConfigRepository,
     private val formatProductPageContentUseCase: IFormatProductPageContentUseCase,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : IFetchUnsyncedProductsUseCase {
@@ -78,12 +81,15 @@ class FetchUnsyncedProductsUseCase @Inject constructor(
             .getProductPageContent(productInfo.url, productInfo.urlType)
             ?: throw Exception("There was an error trying to connect with page")
 
-        val updatedProductPageInfo =
-            formatProductPageContentUseCase(productInfo.productId, pageContent)
+        val pageConfig = pageConfigRepository.getPageConfigByProductId(productInfo.productId)
+            ?: throw Exception("There's no page configuration for this product")
+
+        val mappedContent =
+            formatProductPageContentUseCase(pageContent, pageConfig)
 
         TODO("Notify changes if is needed")
         TODO("Update price if is needed")
-        storeProductChanges(updatedProductPageInfo)
+//        storeProductChanges(updatedProductPageInfo)
 
     }
 }

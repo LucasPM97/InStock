@@ -44,10 +44,11 @@ fun PathElement.classNameQueryFormat(): String? = className?.replace(
     "\\s".toRegex(), "."
 )
 
-fun Element.findElement(path: List<PathElement>): Element? {
+fun Element.findElement(path: String): Element? {
+    val pathList = mapPath(path)
     var elementsFound = emptyList<Element>()
 
-    path.forEach { pathElement ->
+    pathList.forEach { pathElement ->
 
         if (elementsFound.isEmpty()) {
             elementsFound = findAllElements(pathElement)
